@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pharmacy Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Pharmacy Simulator</h1>
+    <p>Envie o arquivo .med e a chave correspondente para visualizar as prescrições de medicamentos.</p>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                    <p class="flash">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form method="post" enctype="multipart/form-data">
+        <label for="med_file">Arquivo .med:</label>
+        <input type="file" id="med_file" name="med_file" accept=".med" required><br><br>
+        <label for="key_file">Arquivo .key:</label>
+        <input type="file" id="key_file" name="key_file" accept=".key" required><br><br>
+        <button type="submit">Descriptografar e Visualizar</button>
+    </form>
+
+    {% if medications %}
+        <h2>Prescrições de Medicamentos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicamento</th>
+                    <th>Dose</th>
+                    <th>Administração</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for med in medications %}
+                <tr>
+                    <td>{{ med.medication }}</td>
+                    <td>{{ med.dose }}</td>
+                    <td>{{ med.administration }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</body>
+</html>
