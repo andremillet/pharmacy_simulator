@@ -1,12 +1,17 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, redirect
 from cryptography.fernet import Fernet
 import json
+import os
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = 'pharmacy_simulator_secret'  # Required for flash messages
+app.secret_key = 'pharmacy_simulator_secret'
 
-# Allowed file extensions
+UPLOAD_FOLDER = '/app/uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 ALLOWED_EXTENSIONS = {'med', 'key'}
 
 def allowed_file(filename):
@@ -41,7 +46,6 @@ def extract_medication_info(decrypted_data):
 def index():
     medications = []
     if request.method == 'POST':
-        # Check if files are uploaded
         if 'med_file' not in request.files or 'key_file' not in request.files:
             flash('Por favor, envie ambos os arquivos .med e .key.')
             return redirect(request.url)
@@ -49,7 +53,6 @@ def index():
         med_file = request.files['med_file']
         key_file = request.files['key_file']
 
-        # Validate file uploads
         if med_file.filename == '' or key_file.filename == '':
             flash('Nenhum arquivo selecionado.')
             return redirect(request.url)
@@ -58,11 +61,9 @@ def index():
             flash('Apenas arquivos .med e .key são permitidos.')
             return redirect(request.url)
 
-        # Read file contents
         med_content = med_file.read()
         key_content = key_file.read()
 
-        # Decrypt and extract medication info
         decrypted_data = decrypt_med_file(med_content, key_content)
         if decrypted_data:
             medications = extract_medication_info(decrypted_data)
@@ -72,4 +73,5 @@ def index():
     return render_template('index.html', medications=medications)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
