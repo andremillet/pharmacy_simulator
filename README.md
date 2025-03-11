@@ -52,6 +52,8 @@ The Pharmacy Simulator is a web-based application designed to decrypt and displa
 
 This project is open-source under the MIT License
 
+An example can be found at https://pharmacy-simulator.onrender.com
+
 ---
 
 **Author**: André Millet  
